@@ -8,7 +8,7 @@
 | `<strategy>_buy_signal.py`, `<strategy>_sell_signal.py` | `buy`, `sell` | one signal each, same function name |
 | `README.txt` | always | install, usage, data requirements, the data the backtest ran on (interval, session, bar construction, price adjustment), this strategy's warm-up, raw signals against executed trades, signal timing, indicator math |
 | `requirements.txt` | always | `pandas>=1.5.0`, `numpy>=1.21.0`, `TA-Lib>=0.6.5` (wheels for Windows, macOS and Linux bundle the C library), `pytz>=2023.3` |
-| `data_formatter_example.py` | `include_formatter` true | `validate(df)`, three loaders: `from_yfinance(df)` (a download made with `auto_adjust=False`; drops the dividend-adjusted column), `from_tiingo_json(json_data)`, `from_csv(filepath)`, and `to_session_bars(df, interval, extended_hours)` for 1h, 2h, 4h and 12h stock bars from 30-minute bars |
+| `data_formatter_example.py` | `include_formatter` true | `validate(df)`, three loaders: `from_yfinance(df)` (a download made with `auto_adjust=False`; drops the dividend-adjusted column), `from_tiingo_json(json_data, adjustment)` (applies the run's split adjustment from Tiingo's `splitFactor`, or keeps the as-traded prices for a raw run), `from_csv(filepath)`, and `to_session_bars(df, interval, extended_hours)` for 1h, 2h, 4h and 12h stock bars from 30-minute bars (tz-aware index required: the exported code reads a naive index as UTC) |
 
 ## Input contract
 
@@ -18,7 +18,7 @@ A pandas DataFrame with lowercase columns `open`, `high`, `low`, `close`, `volum
 - **Stock `1h`, `2h`, `4h`, `12h`**: counted from the session open and labelled with their start, so a regular-hours day has 1h bars at 09:30, 10:30 ... 15:30, 4h bars at 09:30 and 13:30 (the second ends at the close) and one 12h bar at 09:30; extended hours start at 08:00. A pandas resample anchored at midnight builds different bars and different indicator values. `to_session_bars` in the formatter builds them from 30-minute bars.
 - **Stock daily and coarser**: one bar per trading day; weekly bars labelled with their Monday, monthly with the first of the month, quarterly with the first day of the quarter.
 - **Crypto**: the exchange feed's bars on the UTC clock, around the clock; daily and coarser on the UTC day.
-- **Prices**: split-adjusted and never dividend-adjusted, or as traded, as the run was set. yfinance's default download adjusts closes for dividends; `auto_adjust=False` gives split-adjusted prices, and Yahoo has no unadjusted prices at all.
+- **Prices**: split-adjusted to the run's last bar and never dividend-adjusted, or as traded, as the run was set. A split after the run's end shifts the levels of a later download, not the signals. yfinance's default download adjusts closes for dividends; `auto_adjust=False` gives split-adjusted prices, and Yahoo has no unadjusted prices at all. Tiingo's open, high, low and close are as traded and its adj columns carry dividends too; the formatter's `from_tiingo_json` applies the run's split adjustment.
 
 The example rows in the signal file's docstring are daily whatever the run's interval: they show the frame's shape only. The README's usage:
 
