@@ -1,6 +1,6 @@
 ---
 name: backtestlabs-trade-log-forensics
-description: Diagnoses where a Backtest Labs strategy's edge leaks by computing, from the full trade log and the drawdown table, what no tool reports directly: exit quality from favorable excursion captured, entry quality from adverse excursion on winners against losers, the cost share of profit, loss streaks, losses by holding time and the trades behind each underwater period. Use when the user asks why a strategy lost money, what went wrong in a period, where the losses come from, whether entries or exits are the problem, or which trades caused the drawdown. Not for setting stop and target levels (exit-engineering) or for the validation suite (robustness-audit).
+description: "Diagnoses where a Backtest Labs strategy's edge leaks by computing, from the full trade log and the drawdown table, what no tool reports directly: exit quality from favorable excursion captured, entry quality from adverse excursion on winners against losers, the cost share of profit, loss streaks, losses by holding time and the trades behind each underwater period. Use when the user asks why a strategy lost money, what went wrong in a period, where the losses come from, whether entries or exits are the problem, or which trades caused the drawdown. Not for setting stop and target levels (exit-engineering) or for the validation suite (robustness-audit)."
 ---
 
 # Trade-log forensics on Backtest Labs
