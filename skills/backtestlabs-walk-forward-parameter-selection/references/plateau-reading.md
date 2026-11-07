@@ -8,7 +8,7 @@ Rows under `windows`, one per cycle: `is_start`, `is_end`, `oos_start`, `oos_end
 
 Reading:
 
-1. List the chosen values in window order. A value chosen in most windows, with neighbours chosen in the rest, is a region. Values spread across the whole sweep range with `jumpy` true mean the optimizer found nothing stable; no single value is supported and the honest answer is that.
+1. List the chosen values in window order. A value chosen in most windows, with neighbours chosen in the rest, is a region. Values spread across the whole sweep range mean the optimizer found nothing stable; no single value is supported and the honest answer is that. `jumpy` is the service's own flag (a step of more than half the sweep range between two windows); read it beside the values, since one outlying window trips it while nine agreeing windows still make a region.
 2. Per-window `wfe_pct` sliding downhill across windows means the edge is fading, whatever the overall WFE.
 3. `oos_fills` low in a window makes that window's return a coin flip; weight it accordingly.
 4. The overview's `walk_forward_efficiency_pct` is annualized out-of-sample return over annualized in-sample return across the stitched track; the service's passing line is 50%, and above 100% is flagged as an anomaly. `stitched_oos` against `buy_and_hold_total_return_pct` on the same bars is the live-like comparison.
@@ -23,7 +23,7 @@ Reading a parameter's points:
 
 1. Order the completed points by `realized_value` with the baseline in place. Write the metric beside each.
 2. Set the band: within 10% of the best metric for Sharpe-like metrics, or within the metric's own noise when `closed_trades` is small (a point with far fewer closed trades than its neighbours is a different strategy, not a better setting).
-3. The plateau is the longest run of adjacent values inside the band. Its centre (the median value of the run) is the candidate. A single point above the band with both neighbours far below is a peak: not the candidate.
+3. The plateau is the longest run of adjacent values inside the band. Its centre (the median value of the run) is the candidate. A single point above the band with both neighbours far below is a peak: not the candidate. When the centre is also the best point, take it and say so; when the plateau has two centre candidates, take the one farther from the cliff (the first value outside the band).
 4. A curve that rises to the edge of the tested range means the region may continue past it; say so rather than extrapolating.
 
 Reading the surface:
@@ -38,6 +38,7 @@ Reading the surface:
 |---|---|---|
 | Stable, modal value inside the plateau | Present | The plateau centre; it agrees with what was chosen out of sample. |
 | Stable, modal value outside the plateau | Present | The windows' value: it was scored out of sample. Note that the full-period surface disagrees. |
+| Stable, modal value at the plateau's edge | Present, centre untried by walk forward | The centre, with the note that the out-of-sample evidence is for the edge value and the confirmation run tests the centre. |
 | Jumpy | Present | The plateau centre, with the note that re-tuning would not have found it reliably; expect less than the in-sample metric. |
 | Jumpy | Absent (a peak or a slope) | No supported value. Report the result; the strategy's logic, not its number, is the question. |
 
