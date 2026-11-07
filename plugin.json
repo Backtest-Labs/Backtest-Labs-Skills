@@ -1,0 +1,29 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "backtestlabs",
+  "version": "0.1.0",
+  "description": "Build, backtest, diagnose, validate and export trading strategies with the Backtest Labs MCP server: seven skills that chain its tools into complete workflows.",
+  "author": { "name": "Backtest Labs", "url": "https://www.backtestlabs.com" },
+  "homepage": "https://www.backtestlabs.com",
+  "license": "MIT",
+  "keywords": ["backtesting", "trading strategies", "quantitative", "pine script", "python"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Backtest Labs",
+        "shortDescription": "No-code strategy backtesting",
+        "longDescription": "Backtest Labs builds and backtests trading strategies on stocks and crypto, from one-minute to monthly bars. A strategy is a graph of indicator, operator and order nodes. A backtest runs each ticker on its own against the costs, slippage and position sizing you set, and reports returns, drawdowns, the trade log and ten validations (Monte Carlo, trade sequence, hold-out, market regime, rolling window, cost stress, execution robustness, parameter sensitivity, walk-forward and overfitting). A completed backtest exports as Pine Script or Python signal code.",
+        "developerName": "Backtest Labs",
+        "websiteURL": "https://www.backtestlabs.com",
+        "supportURL": "https://www.backtestlabs.com/docs/mcp/mcp-troubleshooting",
+        "privacyPolicyURL": "https://www.backtestlabs.com/privacy",
+        "termsOfServiceURL": "https://www.backtestlabs.com/terms",
+        "defaultPrompt": [
+          "Backtest a 20/50 EMA crossover on QQQ 4-hour bars over the last year and summarize the results",
+          "Does my latest backtest hold up? Walk me through its validation results",
+          "Export the strategy from my latest backtest as Pine Script"
+        ]
+      }
+    }
+  }
+}

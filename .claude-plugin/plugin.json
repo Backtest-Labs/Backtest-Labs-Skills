@@ -1,0 +1,12 @@
+{
+  "name": "backtestlabs",
+  "displayName": "Backtest Labs",
+  "version": "0.1.0",
+  "description": "Build, backtest, diagnose, validate and export trading strategies with the Backtest Labs MCP server: seven skills that chain its tools into complete workflows.",
+  "author": {
+    "name": "Backtest Labs",
+    "url": "https://www.backtestlabs.com"
+  },
+  "license": "MIT",
+  "privacyPolicyUrl": "https://www.backtestlabs.com/privacy"
+}
