@@ -3,11 +3,14 @@
 From each closing fill (SELL or SHORT_COVER row of `get_trades`):
 
 ```
-entry_cost = realized_pnl / (pnl_pct / 100)
-MAE_pct    = |mae_value| / entry_cost * 100        (mae_value is stored negative; 0 when the trade never went against)
+entry_cost = quantity * price - realized_pnl - commission     (the fill's own row; price is the exit fill)
+return_pct = realized_pnl / entry_cost * 100                  (pnl_pct in the row is this rounded to two decimals)
+MAE_pct    = |mae_value| / entry_cost * 100                   (mae_value is stored negative; 0 when the trade never went against)
 MFE_pct    = mfe_value / entry_cost * 100
 outcome    = winner if realized_pnl > 0, loser if < 0
 ```
+
+For a short cover, entry_cost = quantity * price + realized_pnl + commission. Never divide `realized_pnl` by `pnl_pct`: the rounding puts trades several percent off and a breakeven trade divides by zero.
 
 MAE and MFE are measured in money against the weighted average entry of the units closed, from every held bar's high and low with the exit fill as the last point, so the realized move always lies inside the excursion: an exit on a favorable gap at the open sets MFE to the exit itself, and an adverse gap sets MAE. A chain with several entry legs has one excursion pair per closing fill.
 
@@ -35,7 +38,19 @@ new_pnl_pct = -s            if MAE_pct > s
 new_pnl     = new_pnl_pct / 100 * entry_cost
 ```
 
-Sum `new_pnl - realized_pnl` over all trades. Count winners with MAE_pct > s (winners lost) and losers with MAE_pct > s (losers cut). Each stopped trade also pays one more fill's slippage, approximated by the mean slippage of the log's exit fills.
+Sum `new_pnl - realized_pnl` over all trades. Count winners with MAE_pct > s (winners lost) and losers with MAE_pct > s (losers cut). The stop fill replaces the signal exit, so no extra slippage is charged unless the strategy re-enters after the stop.
+
+Fragility checks on the same numbers:
+
+```
+top3_share   = sum of the three largest (new_pnl - realized_pnl) / total change
+half_split   = the change summed over the first half of the trades in time, and over the second
+pct_change   = sum(new_pnl_pct - return_pct) over the changed trades   (position size out of the picture)
+```
+
+A top-three share near 1, or a split where one half loses, means the level fits this sample. Report them with the estimate.
+
+The estimate works from the log's MAE, the worst intraday low. The Stop Loss node fires on a close below the level and fills at the next open, so some trades counted as stopped would not have been (low below, close above), and every stopped loss is the level plus the overnight gap. Read the estimate as the most trades a stop could touch and the least it would lose per stop.
 
 ## Estimating a target at t%
 
@@ -79,7 +94,7 @@ Stop estimates (closed-trade P&L 11,086):
 | 4.0% | 12,164 | +1,078 | 2 | 22 |
 | 5.0% | 10,931 | -154 | 1 | 18 |
 
-The 3.5% stop, between the winners' 90th percentile and the losers' median, is the candidate: two winners lost, 27 losers cut early, the largest estimated gain. The 2% stop sits inside the winners' distribution and costs more than it saves.
+The 3.5% stop, between the winners' 90th percentile and the losers' median, is the candidate on the estimate: two winners lost, 27 losers cut early, the largest estimated gain. The 2% stop sits inside the winners' distribution and costs more than it saves. The fragility checks temper it: three trades carry about all of the +1,846 (a -11.7% and a -9.6% loss stopped at -3.5%), the other stopped trades together lose money because many losers dipped past 3.5% and recovered to a smaller loss, and the first half of the trades loses at every level from 2.5% to 5% while the second half gains. The level is a candidate for a run, not a conclusion; the run with hold-out on decides. Every number here is this one sample's; compute the user's run, never reuse these.
 
 Target estimates: 2.0% caps 39 winners and turns 5 losers, change -5,425; 3.0% change -2,101; 4.0% change -7 (10 capped, 3 turned). On a strategy whose winners are small and frequent, and whose best exits land on gaps at the open, a target below the winners' 90th percentile MFE costs more than it saves; the estimate says so before a run is spent.
 

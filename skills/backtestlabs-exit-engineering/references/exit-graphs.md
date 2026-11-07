@@ -4,7 +4,7 @@ Node shapes as the document reference lists them. Every config carries every key
 
 ## Reference price for a stop or target
 
-Stop Loss and Profit Target measure their level from `data_in`; unwired, they use the close, which makes the level drift with price. Wire the entry: the Buy node's output into a Capture node (`mode` `last`, `initialValue` null). A signal-only wire carries no value, so Capture stores the close of the bar the buy signal fired on and holds it until the next capture; the value is available from the bar after. Fan the captured series out with a Split to each level node's `data_in`.
+Stop Loss and Profit Target measure their level from `data_in`; unwired, they use the close, which makes the level drift with price. Wire the entry: the Buy node's output into a Capture node (`mode` `last`, `initialValue` null). A signal-only wire carries no value, so Capture stores the close of the bar the buy signal fired on and holds it until the next capture; the value is available from the bar after. That close is one bar before the fill, so a percentage level sits that bar's move away from the fill price. The level node fires on a close through the level, not on an intraday touch, and the exit fills at the next open. Fan the captured series out with a Split to each level node's `data_in`.
 
 ```
 Buy.out0 -> Capture.in0 -> Split.in0
