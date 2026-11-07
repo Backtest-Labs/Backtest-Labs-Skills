@@ -6,7 +6,7 @@ Compute each statistic on the closed-trade table from `derivations.md`. Winners:
 
 | Statistic | How | Reading |
 |---|---|---|
-| MFE captured, winners: median, 25th pct | `realized_pnl / mfe_value` | median below about 0.5: winners gave back half their best open profit; the exit is late or absent |
+| MFE captured, winners: median, 25th pct | `(realized_pnl + commission) / mfe_value`; a value of 1 is an exit at the trade's best price | median below about 0.5: winners gave back half their best open profit; the exit is late or absent. Many winners at 1 means the exits land on favorable gaps at the open, which a target set from MFE will not reproduce |
 | Give-back, winners: median `MFE_pct - pnl_pct` | | in percent of entry, what a trailing exit would have to recover |
 | Losers that were up: count and share with `mfe_value` above 0.5 x `initial_risk` (or MFE_pct above 1% when no R) | | these were winners for a while; a target or trailing stop turns some into wins |
 | Losers' final loss against their MFE: sum of `mfe_value` over losers | | the open profit the strategy held and lost |
@@ -26,7 +26,7 @@ A target set from these numbers is exit-engineering's job; here the finding is t
 
 | Statistic | How | Reading |
 |---|---|---|
-| `cost_over_gross` | total cost over gross profit | above about 0.3 the strategy works for the broker; the summary's `slippage_drag_pct` and `commission_drag_pct` give the same in share of starting equity |
+| `cost_over_edge` | total cost over the zero-cost P&L (net P&L with every fill's cost added back) | above about 0.3 the strategy works for the broker; the summary's `cost_drag_pp` against `gross_return_pct` is the same reading in points of return |
 | Near-zero trades: count with abs(`pnl_pct`) below 2 x (chain cost / entry cost x 100) | | trades whose move was smaller than twice their cost: frequency without edge |
 | Cost per chain against `expectancy` | mean chain cost against the summary's `expectancy` | cost a large fraction of expectancy means a small shift in slippage flips the sign; Cost Stress's `profit_change_per_1x_cost_pct` says by how much |
 | Legs per chain | | many legs with small quantities means repeated entries paying the half-spread each time |
@@ -38,7 +38,7 @@ A target set from these numbers is exit-engineering's job; here the finding is t
 | P&L by calendar month and year | sum `realized_pnl` by month of exit | with `periodic_returns`: the months that hold most of the loss |
 | P&L by exit weekday | | a weekday effect on daily data is usually noise unless the strategy is calendar-based |
 | Holding time: median `holding_period_hours`, winners against losers | | losers held much longer than winners means the strategy waits for a signal that comes late when wrong: a Max Hold or a stop |
-| Loss by holding bucket | bucket by hours (one bar, up to 5 bars, up to 20, longer, in the run's interval) and sum losses | which duration carries the losses |
+| Loss by holding bucket | `holding_period_hours` is calendar time from the entry fill to the exit fill, so a daily bar held over a weekend reads 72. Bucket by calendar days on daily and longer intervals (1, 2 to 5, 6 to 20, longer) and by hours on intraday ones (within a session, 2 to 5 sessions, longer; crypto trades 24 hours a day); sum losses per bucket | which duration carries the losses |
 | Regime | overview `market_regime.annualized_return_pct_by_regime` | a loss concentrated in one cell is a gate question (Direction Filter on a trend series, Volatility Regime) |
 | Underwater periods | `drawdowns` section; sum `realized_pnl` of closing fills inside each | few chains making the drawdown: sizing or stop; many: regime or frequency |
 
@@ -56,6 +56,6 @@ One group leads. State the statistic, its value with n, the comparison that sing
 
 - Exits leak: Profit Target or Trailing Stop from MFE (exit-engineering), or an earlier signal exit.
 - Entries loose: a confirming condition through And, a `cross` trigger in place of `state`, a Direction Filter on a trend series.
-- Costs: fewer, larger trades; a filter that removes the near-zero trades; a lower `volume_participation_threshold` is a model setting, not a fix.
+- Costs: fewer, larger trades; a filter that removes the near-zero trades; a lower `volume_participation_threshold` is a model setting, not a fix. Costs are already inside every `realized_pnl`; a diagnosis that subtracts them again double-counts.
 - Time and regime: a regime gate; `holding_periods` Max Hold for the long losers.
 - Sequence: sizing (`amount_value`, `reserved_cash_value`), not signal changes.

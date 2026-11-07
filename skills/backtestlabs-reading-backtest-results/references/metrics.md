@@ -19,7 +19,7 @@ Values from `get_results`, overview and `summary` section. Names ending `_pct` a
 | Value | Shows | How to read | Trap |
 |---|---|---|---|
 | `annualized_volatility_pct` | standard deviation of bar returns, annualized | against the benchmark's | intraday runs annualize by bars per day times the base |
-| `sharpe_ratio` | annualized Sharpe, net of the risk-free rate | with closed trades and `sharpe_sufficient` | a flat equity line gives a Sharpe near 0 with a note; few trades make it unstable |
+| `sharpe_ratio` | annualized Sharpe, net of the risk-free rate | with `sharpe_sufficient`, which judges the bar-return sample it is computed from | a flat equity line gives a Sharpe near 0 with a note; a stable Sharpe on many bars says nothing about whether a few trades decided the result, which is SQN's question |
 | `sortino_ratio` | downside deviation measured from zero | above Sharpe when losses are small and gains lumpy | |
 | `calmar_ratio` | CAGR over max drawdown | a return-per-unit-of-pain figure | needs a drawdown and enough data (`calmar_sufficient`) |
 | `max_drawdown_pct` | deepest fall from a running peak | with `longest_drawdown_days` and `max_drawdown_date` | `max_drawdown_value` (money) can be on another bar |
@@ -27,6 +27,7 @@ Values from `get_results`, overview and `summary` section. Names ending `_pct` a
 | `avg_drawdown_pct`, `drawdown_distribution` | the typical underwater period | mean, median and 95th percentile depth and duration (`duration_unit` days, or bars intraday) | the max is one event; the distribution is the habit |
 | `recovery_factor` | net profit over the max drawdown in money | how many times the worst loss was earned back | |
 | `best_day_pct`, `worst_day_pct`, `worst_month_pct` | the extremes | with `positive_days_pct` | weekly and monthly runs report the best and worst bar |
+| `positive_days_pct` | share of days whose return is above zero | read with `average_leverage`: a flat day out of the market counts as not positive | a strategy invested 40% of the time cannot score far above 40%; the figure describes exposure as much as hit rate |
 | `tail_ratio` | 95th percentile bar return over the magnitude of the 5th | above 1: the good tail is longer | |
 | `skewness` | skewness of bar returns | positive: rare large gains; negative: rare large losses | |
 | `average_leverage`, `max_leverage` | gross exposure over equity | 1.0 is fully invested; above 1 means borrowing | mean exposure, not time in market |
@@ -43,7 +44,7 @@ Values from `get_results`, overview and `summary` section. Names ending `_pct` a
 | `payoff_ratio` | mean win over mean loss, as magnitudes | with win rate: expectancy = win rate x mean win minus loss rate x mean loss | |
 | `expectancy` | average P&L per closed trade | the sign of the edge in money | small against costs per trade means fragile |
 | `average_win`, `average_loss`, `largest_win`, `largest_loss` | the trade P&L shape | `largest_win` against `total_pnl` | one trade holding most of the P&L |
-| `pnl_std`, `sqn` | dispersion; System Quality Number = sqrt(n) x mean / std | SQN grows with trade count | |
+| `pnl_std`, `sqn` | dispersion; System Quality Number = sqrt(n) x mean P&L / std | SQN is the t-statistic of the average closed trade against zero, so it is the fastest check of whether the trade sample supports the expectancy: below about 1.6 the average trade is not distinguishable from zero at these counts; 2 and above is | it grows with trade count, so a long run of small trades scores high on frequency, not size |
 | `max_win_streak`, `max_loss_streak` | longest runs | Trade Sequence gives the odds of the loss streak | |
 | `annual_turnover_pct` | SEC turnover, annualized | 2400% means the account turned over 24 times a year | |
 | `total_commissions`, `total_slippage`, `total_borrow_cost`, `total_margin_interest` | costs paid | against `total_pnl` | |

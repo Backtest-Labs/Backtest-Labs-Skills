@@ -18,6 +18,7 @@ Follow the order. Each step is one call; stop early when the user's question is 
 5. **Periodic returns** for concentration: which years and months carried the return, how many lost, whether one month holds most of the P&L.
 6. **Drawdowns** for the ten deepest underwater periods with dates, depth, duration and whether one is ongoing.
 7. **Trade analysis** for holding periods (hours, first entry to final exit) and capacity (fill size against the ticker's average daily volume, or 24-hour traded value for crypto).
+   **Then the trade concentration**, from the summary's `largest_win` against `total_pnl` and, when the largest win is a large share, from `get_trades`: sum the closing fills' `realized_pnl` in descending order and report how many trades make the whole profit. Periodic returns show concentration in time; only the log shows it in trades.
 8. **Validations** that ran, each from its overview block first (`references/validations.md` says what each shows and its trap). Fetch a validation's full section only when the question needs its rows (windows, regime cells, sweep points).
 9. **Charts** only when a shape answers the question better than the numbers: call `get_chart` with the ticker alone to list pages and chart ids, then one page or one chart. Prefer `visuals` false, which returns the plotted series as text. Each image costs about 1,250 to 1,600 tokens and a page returns up to six.
 
@@ -28,10 +29,13 @@ Follow the order. Each step is one call; stop early when the user's question is 
 ## Traps
 
 - **Annualized statistics on short or intraday runs.** `data_sufficiency` in the summary section says which are stable. Volatility and Sharpe on 4h bars are annualized by bars per day times the base; compare only runs on the same interval.
-- **Sharpe on few trades.** Below about 30 closed trades the ratio is a description of a handful of outcomes. Say the count beside the ratio.
+- **Sharpe against the trade count.** Sharpe is computed from bar returns and `data_sufficiency` judges that sample; it can be stable on hundreds of bars while a handful of trades decided the sign. Whether the trades support the expectancy is `sqn`'s question (the t-statistic of the average trade); quote the closed-trade count and SQN beside the Sharpe.
 - **Win rate against expectancy.** A 65% win rate with a payoff ratio below 1 can still lose; expectancy (average P&L per closed trade) and profit factor carry the sign.
 - **Profit factor carried by one trade.** Compare `largest_win` with `total_pnl`; a run whose largest win is most of its P&L is one trade, not an edge. The 999.99 cap and the null with note mean no losing trade.
 - **One year carrying the return.** Periodic returns with one strong year and flat or negative others is a single regime, not a strategy that works across them.
+- **A few trades carrying the return.** When the top few closing fills sum to all of `total_pnl` or more, the rest of the trades lost money together; say how many trades the profit rests on.
+- **Hold-out halves against the whole.** Each half is a separate backtest from a flat start, so a trade open across the split is cut and never re-entered; the whole run's CAGR can differ from both halves'. Check the log for a position open on `split_date` before reading the gap as degradation.
+- **Monte Carlo and Trade Sequence actuals.** Their "actual" figures sit on the closed-trade step path, dividends excluded and open-position swings unseen, so they differ from the summary's equity and drawdown by design.
 - **Exposure against time in market.** `average_leverage` of 0.4 means the account was 40% invested on average; a return of 20% on 40% exposure is a different edge than 20% fully invested. The exposure chart shows when.
 - **Benchmarks from the same starting cash.** `final_value` under a benchmark is buy and hold from the same cash on the same period; a late-starting benchmark has a shorter period, flagged in `warnings`.
 - **Drawdown in money against percent.** `max_drawdown_value` can fall on another bar than `max_drawdown_pct`; quote the one the question asks for.
@@ -55,9 +59,9 @@ Validity: coverage <traded/period bars per ticker>; validations that ran: <list>
 <ticker>:
   Return <x>% (buy and hold <y>%, <excess> pp); CAGR <x>%; max drawdown <x>% (<days> days, <ongoing?>)
   Sharpe <x> / Sortino <x> / Calmar <x>; volatility <x>%; <data sufficiency notes>
-  <n> closed trades: win rate <x>%, profit factor <x>, payoff <x>, expectancy <money>; streaks <w>/<l>
+  <n> closed trades: win rate <x>%, profit factor <x>, payoff <x>, expectancy <money>, SQN <x>; streaks <w>/<l>
   Costs: gross <x>% to net <x>%; <largest drag line>
-  Concentration: <best year share of P&L>, <losing years>
+  Concentration: <best year share of P&L>, <losing years>; <top n trades = x% of total P&L>
   Validations: <one line each, from validations.md>
 How to read it: <two or three sentences on what these numbers do and do not establish>
 Open questions: <what a next skill would answer>

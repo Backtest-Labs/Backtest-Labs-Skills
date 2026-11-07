@@ -10,13 +10,15 @@ Read: `actual_final_equity` against `median_final_equity` and the CI (`final_equ
 
 Trap: the paths are built from the run's own closed-trade P&L; they say nothing about trades the strategy never took. Few trades give a wide CI by construction.
 
+The "actual" figures are on that same closed-trade path, not the run's bar-by-bar equity: `actual_final_equity` is starting cash plus the sum of closed-trade P&L, with dividends left out (the section's `excluded_dividends` gives their count and total), and `actual_max_drawdown_pct` is the deepest dip of that step path, which never sees an open position's swings. So they differ from the summary's `final_equity` (by the dividends) and `max_drawdown_pct` (which is usually deeper). That is the method, not a discrepancy; compare the actual figures with the simulated ones beside them, not with the summary.
+
 ## Trade Sequence (`trade_sequence`)
 
 Reorders the same closed trades without replacement, so every path ends at the same equity and only the order differs. Answers: how much of the drawdown, the losing streak and the time underwater was the luck of the order. Needs at least five closing trades.
 
 Read: `max_drawdown_percentile_rank` (higher is milder than most orderings), `longest_losing_streak` and `longest_time_underwater` each with actual, median, p95 and percentile rank.
 
-Trap: a run whose actual drawdown ranks near the p95 of its own orderings got a kind order; expect worse.
+Trap: a run whose actual drawdown ranks near the p95 of its own orderings got a kind order; expect worse. The actual values are measured on the closed-trade step path, as in Monte Carlo (dividends excluded, open-position swings unseen), so they differ from the summary's drawdown and streaks measured on bar equity.
 
 ## Hold-Out (`hold_out`)
 
@@ -26,13 +28,15 @@ Read: `split_date`; for Sharpe, CAGR, max drawdown and win rate the `in_sample`,
 
 Trap: a better out-of-sample half can be a friendlier market, not a better strategy; read it beside `buy_hold_cagr_pct` for the same halves.
 
+Each half is its own backtest from a flat start with the full starting cash: the in-sample run stops at the split date and the out-of-sample run begins there with no position. A trade open across the split is cut in the first half and never entered in the second, so the two halves do not add up to the full run; the full run's CAGR can sit above or below both halves', and a large trade straddling the split moves every out-of-sample figure. When the halves disagree with the whole, check the trade log for a position open on `split_date` before reading anything else into it.
+
 ## Market Regime (`market_regime`)
 
 Classifies every bar of the ticker's own price by trend (moving-average slope rising or flat against falling) and volatility (terciles of the run's rolling volatility), with no re-run. Answers: does the edge show up across conditions or in one of them. A regime under 20 bars is absent, not zero.
 
-Read: `annualized_return_pct_by_regime` for `uptrend`, `downtrend`, `low_vol`, `medium_vol`, `high_vol`; `annualized_return_spread_pp` per axis (best minus worst). The full section adds per-cell Sharpe and closed-trade win rates (trades counted by exit bar) and the benchmarks bucketed the same way.
+Read: `annualized_return_pct_by_regime` for `uptrend`, `downtrend`, `low_vol`, `medium_vol`, `high_vol`; `annualized_return_spread_pp` per axis (best minus worst). The overview carries the strategy's returns only. Fetch the `market_regime` section whenever a benchmark ran: it holds the per-cell Sharpe, the closed-trade win rates (trades counted by exit bar) and the benchmarks bucketed by the same regimes, which the trap below needs.
 
-Trap: a long-only strategy that earns in uptrends and loses in downtrends is describing the market; the question is whether it lost less than buy and hold in the downtrend cell.
+Trap: a long-only strategy that earns in uptrends and loses in downtrends is describing the market; the question is whether it lost less than buy and hold in the downtrend cell, which only the section's benchmark rows answer.
 
 ## Rolling Window (`rolling_window`)
 

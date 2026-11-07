@@ -9,7 +9,7 @@ MFE_pct    = mfe_value / entry_cost * 100
 outcome    = winner if realized_pnl > 0, loser if < 0
 ```
 
-MAE and MFE are measured from the fill, in money, while the position was open, against the weighted average entry of the units closed. A chain with several entry legs has one excursion pair per closing fill.
+MAE and MFE are measured in money against the weighted average entry of the units closed, from every held bar's high and low with the exit fill as the last point, so the realized move always lies inside the excursion: an exit on a favorable gap at the open sets MFE to the exit itself, and an adverse gap sets MAE. A chain with several entry legs has one excursion pair per closing fill.
 
 ## Percentiles
 
@@ -63,13 +63,13 @@ Computed from the run's own log with the formulas above.
 |---|---|---|---|---|---|
 | winners MAE% | 0.86 | 1.51 | 2.56 | 7.39 | 96 |
 | losers MAE% | 3.92 | 7.03 | 9.92 | 14.35 | 50 |
-| winners MFE% | 1.86 | 2.92 | 4.03 | 19.62 | 96 |
+| winners MFE% | 2.26 | 3.30 | 4.40 | 21.94 | 96 |
 | losers MFE% | 0.39 | 0.96 | 1.99 | 7.75 | 50 |
 | winners give-back | 0.31 | 0.66 | 1.24 | 3.23 | 96 |
 
-The gap: winners' 90th percentile MAE is 2.56%, losers' median is 3.92%. Winners' median MFE captured is 0.87, so exits are not the leak; losers held twice as long as winners (median 144 against 72 hours). Eleven of fifty losers had been up more than 1%.
+The gap: winners' 90th percentile MAE is 2.56%, losers' median is 3.92%. Winners' median MFE captured is 0.87 (25th percentile 0.57), so exits are not the leak; losers held twice as long as winners (median 144 against 72 hours). Eleven of fifty losers had been up more than 1%.
 
-Stop estimates (closed-trade P&L 11,086 before costs):
+Stop estimates (closed-trade P&L 11,086):
 
 | stop | new P&L | change | winners lost | losers cut |
 |---|---|---|---|---|
@@ -81,7 +81,7 @@ Stop estimates (closed-trade P&L 11,086 before costs):
 
 The 3.5% stop, between the winners' 90th percentile and the losers' median, is the candidate: two winners lost, 27 losers cut early, the largest estimated gain. The 2% stop sits inside the winners' distribution and costs more than it saves.
 
-Target estimates: 2.0% caps 33 winners and turns 5 losers, change -4,940; 3.0% change -985; 4.0% change +795 (7 capped, 3 turned). On a strategy whose winners are small and frequent, a target below the winners' 90th percentile MFE costs more than it saves; the estimate says so before a run is spent.
+Target estimates: 2.0% caps 39 winners and turns 5 losers, change -5,425; 3.0% change -2,101; 4.0% change -7 (10 capped, 3 turned). On a strategy whose winners are small and frequent, and whose best exits land on gaps at the open, a target below the winners' 90th percentile MFE costs more than it saves; the estimate says so before a run is spent.
 
 Trailing upper bounds: 1% at most +9,383 (21 trades changed), 2% at most +5,879 (8), 3% at most +4,499 (4). These are ceilings; the path is unknown.
 

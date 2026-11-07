@@ -41,6 +41,7 @@ State the estimate from step 3 to 5 beside the run's actual change; the differen
 ## What the estimate ignores
 
 - A stop fills at the next bar's open after the close that crossed the level, so a gap takes the loss past the level.
+- The exit fill is the excursion's last point, so a trade that exited on a gap at the open has its MFE or MAE at the exit price itself; a stop or target cannot reproduce such an exit.
 - The Capture reference is the signal bar's close, one bar before the fill; a percentage from it differs from a percentage from the fill price by the overnight move.
 - After a stop the entry condition may fire again and re-enter; the estimate keeps the original trades.
 - Merged entries (several legs in a chain) share one excursion against the average entry.
