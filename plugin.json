@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "backtestlabs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Build, backtest, diagnose, validate and export trading strategies with the Backtest Labs MCP server: seven skills that chain its tools into complete workflows.",
   "author": { "name": "Backtest Labs", "url": "https://www.backtestlabs.com" },
   "homepage": "https://www.backtestlabs.com",

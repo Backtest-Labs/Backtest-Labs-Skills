@@ -15,7 +15,7 @@
 
 Rows are ordered by chain, then time; rows outside a numbered chain come first. Rows are paginated 200 at a time: fetch every page.
 
-A chain `<TICKER>_n` is one position: consecutive entries in the same direction merge, so a chain can hold several entry fills and one or more closing fills. The closing fill's `realized_pnl` and excursions are against the weighted average entry of the units it closes.
+A chain `<TICKER>_n` is one position: consecutive entries in the same direction merge, so a chain can hold several entry fills and one or more closing fills. The closing fill's `realized_pnl` and excursions are against the weighted average entry of the units it closes: a partial exit's `mae_value` and `mfe_value` are the share of the position's excursion that belongs to the units it closed, so the per-fill formulas below hold on every row.
 
 The excursions run from the entry fill through the exit fill: every held bar's high and low count, and the exit price is the last point, so a trade's realized move always lies inside its own excursion (MFE is at least the gross profit, MAE at least the gross loss). `realized_pnl` is net of commissions, so compare it with the excursion after adding the row's commission back. A run completed before the exit fill was part of the excursion can show a realized move outside it; re-run the strategy rather than analyse that log.
 
