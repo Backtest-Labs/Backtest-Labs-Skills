@@ -1,7 +1,7 @@
 {
   "name": "backtestlabs",
   "displayName": "Backtest Labs",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Build, backtest, diagnose, validate and export trading strategies with the Backtest Labs MCP server: seven skills that chain its tools into complete workflows.",
   "author": {
     "name": "Backtest Labs",
@@ -10,6 +10,18 @@
   "homepage": "https://www.backtestlabs.com/mcp",
   "repository": "https://github.com/Backtest-Labs/Backtest-Labs-Skills",
   "license": "MIT",
+  "keywords": [
+    "backtesting",
+    "trading strategies",
+    "strategy validation",
+    "walk-forward",
+    "monte carlo",
+    "overfitting",
+    "pine script",
+    "python",
+    "stocks",
+    "crypto"
+  ],
   "icon": "./.claude-plugin/icon.png",
   "documentationUrl": "https://www.backtestlabs.com/docs/mcp",
   "supportUrl": "https://www.backtestlabs.com/docs/mcp/mcp-troubleshooting",
